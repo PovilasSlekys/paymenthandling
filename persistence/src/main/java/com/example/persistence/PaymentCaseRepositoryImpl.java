@@ -1,10 +1,7 @@
 package com.example.persistence;
 
-import com.example.domain.models.AmountCurrency;
-import com.example.domain.models.ResolutionEnum;
+import com.example.domain.models.*;
 import com.example.persistence.entities.PaymentCaseEntity;
-import com.example.persistence.entities.PaymentCaseEntityMapper;
-import com.example.domain.models.PaymentCase;
 import com.example.persistence.repositories.PaymentCaseJpaRepository;
 import com.example.domain.repositories.PaymentCaseRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +20,11 @@ import java.util.stream.Collectors;
 public class PaymentCaseRepositoryImpl implements PaymentCaseRepository {
 
     private final PaymentCaseJpaRepository repository;
-    private final PaymentCaseEntityMapper mapper;
 
     @Override
     public UUID save(PaymentCase paymentCase) {
         PaymentCaseEntity entity;
-        entity = repository.save(mapper.convertModelToEntity(paymentCase));
+        entity = repository.save(new PaymentCaseEntity(paymentCase));
         return entity.getCaseId();
     }
 
@@ -39,7 +35,7 @@ public class PaymentCaseRepositoryImpl implements PaymentCaseRepository {
         if (paymentCaseEntity.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(mapper.convertEntityToModel(paymentCaseEntity.get()));
+            return Optional.of(convertEntityToModel(paymentCaseEntity.get()));
         }
     }
 
@@ -69,5 +65,18 @@ public class PaymentCaseRepositoryImpl implements PaymentCaseRepository {
         PaymentCaseEntity entity = new PaymentCaseEntity();
         entity.setResolution(ResolutionEnum.UNRESOLVED.name());
         return repository.findAll(Example.of(entity)).stream().map(PaymentCaseEntity::getCurrency).distinct().collect(Collectors.toList());
+    }
+
+    private PaymentCase convertEntityToModel(PaymentCaseEntity entity) {
+        Payment payment = new Payment(entity.getPaymentId(), new AmountCurrency(entity.getAmount(), entity.getCurrency()));
+        return new PaymentCase(
+                entity.getCaseId(),
+                mapToEnum(CaseTypeEnum.class, entity.getCaseType()),
+                payment,
+                mapToEnum(ResolutionEnum.class, entity.getResolution()));
+    }
+
+    private <T extends Enum<T>> T mapToEnum(Class<T> enumClass, String enumValue) {
+        return enumValue == null ? null : Enum.valueOf(enumClass, enumValue);
     }
 }

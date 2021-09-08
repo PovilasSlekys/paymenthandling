@@ -7,8 +7,15 @@ import com.example.domain.error.ResourceNotFoundException;
 import com.example.domain.error.ValidationException;
 import com.example.domain.models.*;
 import com.example.domain.repositories.PaymentCaseRepository;
+import com.example.persistence.PaymentCaseRepositoryImpl;
+import com.example.persistence.entities.PaymentCaseEntity;
+import com.example.persistence.repositories.PaymentCaseJpaRepository;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -23,56 +30,173 @@ public class PaymentCaseControllerTests {
     private static final UUID emptyCaseId = UUID.randomUUID();
     private static final UUID resolvedCaseId = UUID.randomUUID();
 
-    PaymentCaseRepository paymentCaseRepository = new PaymentCaseRepository() {
+    PaymentCaseJpaRepository paymentCaseJpaRepository = new PaymentCaseJpaRepository() {
         @Override
-        public UUID save(PaymentCase paymentCase) {
-            return UUID.randomUUID();
+        public List<PaymentCaseEntity> findAll() {
+            return null;
         }
 
         @Override
-        public Optional<PaymentCase> findById(UUID caseId) {
-            if (emptyCaseId.equals(caseId)) {
+        public List<PaymentCaseEntity> findAll(Sort sort) {
+            return null;
+        }
+
+        @Override
+        public Page<PaymentCaseEntity> findAll(Pageable pageable) {
+            return null;
+        }
+
+        @Override
+        public List<PaymentCaseEntity> findAllById(Iterable<UUID> iterable) {
+            return null;
+        }
+
+        @Override
+        public long count() {
+            return 0;
+        }
+
+        @Override
+        public void deleteById(UUID uuid) {
+
+        }
+
+        @Override
+        public void delete(PaymentCaseEntity paymentCaseEntity) {
+
+        }
+
+        @Override
+        public void deleteAllById(Iterable<? extends UUID> iterable) {
+
+        }
+
+        @Override
+        public void deleteAll(Iterable<? extends PaymentCaseEntity> iterable) {
+
+        }
+
+        @Override
+        public void deleteAll() {
+
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> List<S> saveAll(Iterable<S> iterable) {
+            return null;
+        }
+
+        @Override
+        public void flush() {
+
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> S saveAndFlush(S s) {
+            return null;
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> List<S> saveAllAndFlush(Iterable<S> iterable) {
+            return null;
+        }
+
+        @Override
+        public void deleteAllInBatch(Iterable<PaymentCaseEntity> iterable) {
+
+        }
+
+        @Override
+        public void deleteAllByIdInBatch(Iterable<UUID> iterable) {
+
+        }
+
+        @Override
+        public void deleteAllInBatch() {
+
+        }
+
+        @Override
+        public PaymentCaseEntity getOne(UUID uuid) {
+            return null;
+        }
+
+        @Override
+        public PaymentCaseEntity getById(UUID uuid) {
+            return null;
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> Optional<S> findOne(Example<S> example) {
+            return Optional.empty();
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> List<S> findAll(Example<S> example) {
+            return null;
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> List<S> findAll(Example<S> example, Sort sort) {
+            return null;
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> Page<S> findAll(Example<S> example, Pageable pageable) {
+            return null;
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> long count(Example<S> example) {
+            return 0;
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> boolean exists(Example<S> example) {
+            return false;
+        }
+
+        @Override
+        public <S extends PaymentCaseEntity> S save(S s) {
+            return s;
+        }
+
+        @Override
+        public Optional<PaymentCaseEntity> findById(UUID uuid) {
+            if (emptyCaseId.equals(uuid)) {
                 return Optional.empty();
-            } else if (resolvedCaseId.equals(caseId)) {
+            } else if (resolvedCaseId.equals(uuid)) {
                 return Optional.of(
-                        new PaymentCase(
+                        new PaymentCaseEntity(
                                 resolvedCaseId,
-                                CaseTypeEnum.DENMARK,
-                                new Payment(
-                                        "paymentId",
-                                        new AmountCurrency(BigDecimal.TEN, "EUR")
-                                ),
-                                ResolutionEnum.ACCEPT
+                                CaseTypeEnum.DENMARK.toString(),
+                                ResolutionEnum.ACCEPT.toString(),
+                                "paymentId",
+                                BigDecimal.TEN,
+                                "EUR"
                         )
                 );
             } else {
                 return Optional.of(
-                        new PaymentCase(
-                                CaseTypeEnum.DENMARK,
-                                new Payment(
-                                        "paymentId",
-                                        new AmountCurrency(BigDecimal.TEN, "EUR")
-                                ),
-                                paymentCaseRepository
+                        new PaymentCaseEntity(
+                                uuid,
+                                CaseTypeEnum.DENMARK.toString(),
+                                ResolutionEnum.UNRESOLVED.toString(),
+                                "paymentId",
+                                BigDecimal.TEN,
+                                "EUR"
                         )
                 );
             }
         }
 
         @Override
-        public BigDecimal getUnresolvedCases() {
-            return  BigDecimal.TEN;
-        }
-
-        @Override
-        public List<AmountCurrency> getUnresolvedCaseAmounts() {
-            return Arrays.asList(
-                    new AmountCurrency(BigDecimal.ONE, "EUR"),
-                    new AmountCurrency(BigDecimal.TEN, "DKK")
-            );
+        public boolean existsById(UUID uuid) {
+            return false;
         }
     };
 
+    PaymentCaseRepositoryImpl paymentCaseRepository = new PaymentCaseRepositoryImpl(paymentCaseJpaRepository);
     PaymentCaseController paymentCaseController = new PaymentCaseController(paymentCaseRepository);
 
     @Nested
@@ -93,79 +217,7 @@ public class PaymentCaseControllerTests {
         }
 
         @Test
-        public void test02_emptyCaseType() {
-            PaymentCasePostDto paymentCasePostDto =
-                    new PaymentCasePostDto(
-                            null,
-                            new PaymentPostDto(
-                                    "paymentId",
-                                    new AmountCurrencyPostDto(BigDecimal.TEN, "EUR")
-                            )
-                    );
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.createPaymentCase(paymentCasePostDto));
-            assertEquals("Case type must be specified", t.getMessage());
-        }
-
-        @Test
-        public void test03_emptyPayment() {
-            PaymentCasePostDto paymentCasePostDto =
-                    new PaymentCasePostDto(
-                            CaseTypeEnum.DENMARK,
-                            null
-                    );
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.createPaymentCase(paymentCasePostDto));
-            assertEquals("Payment must be specified", t.getMessage());
-        }
-
-        @Test
-        public void test04_emptyPaymentId() {
-            PaymentCasePostDto paymentCasePostDto =
-                    new PaymentCasePostDto(
-                            CaseTypeEnum.DENMARK,
-                            new PaymentPostDto(
-                                    null,
-                                    new AmountCurrencyPostDto(BigDecimal.TEN, "EUR")
-                            )
-                    );
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.createPaymentCase(paymentCasePostDto));
-            assertEquals("Payment ID must be specified", t.getMessage());
-        }
-
-        @Test
-        public void test05_emptyPaymentAmount() {
-            PaymentCasePostDto paymentCasePostDto =
-                    new PaymentCasePostDto(
-                            CaseTypeEnum.DENMARK,
-                            new PaymentPostDto(
-                                    "paymentId",
-                                    null
-                            )
-                    );
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.createPaymentCase(paymentCasePostDto));
-            assertEquals("Payment must have an amount specified", t.getMessage());
-        }
-
-        @Test
-        public void test06_emptyPaymentAmount() {
-            PaymentCasePostDto paymentCasePostDto =
-                    new PaymentCasePostDto(
-                            CaseTypeEnum.DENMARK,
-                            new PaymentPostDto(
-                                    "paymentId",
-                                    new AmountCurrencyPostDto(null, "EUR")
-                            )
-                    );
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.createPaymentCase(paymentCasePostDto));
-            assertEquals("Payment amount must have a value specified", t.getMessage());
-        }
-
-        @Test
-        public void test06_invalidPaymentAmount() {
+        public void test02_invalidPaymentAmount() {
             PaymentCasePostDto paymentCasePostDto =
                     new PaymentCasePostDto(
                             CaseTypeEnum.DENMARK,
@@ -180,22 +232,7 @@ public class PaymentCaseControllerTests {
         }
 
         @Test
-        public void test07_emptyPaymentCurrency() {
-            PaymentCasePostDto paymentCasePostDto =
-                    new PaymentCasePostDto(
-                            CaseTypeEnum.DENMARK,
-                            new PaymentPostDto(
-                                    "paymentId",
-                                    new AmountCurrencyPostDto(BigDecimal.TEN, null)
-                            )
-                    );
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.createPaymentCase(paymentCasePostDto));
-            assertEquals("Payment must have a currency specified", t.getMessage());
-        }
-
-        @Test
-        public void test08_invalidPaymentCurrencyLength() {
+        public void test03_invalidPaymentCurrencyLength() {
             PaymentCasePostDto paymentCasePostDto =
                     new PaymentCasePostDto(
                             CaseTypeEnum.DENMARK,
@@ -210,7 +247,7 @@ public class PaymentCaseControllerTests {
         }
 
         @Test
-        public void test09_invalidPaymentCurrencyCharacters() {
+        public void test04_invalidPaymentCurrencyCharacters() {
             PaymentCasePostDto paymentCasePostDto =
                     new PaymentCasePostDto(
                             CaseTypeEnum.DENMARK,
@@ -244,14 +281,7 @@ public class PaymentCaseControllerTests {
         }
 
         @Test
-        public void test02_invalidCaseId() {
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.getPaymentCase(null));
-            assertEquals("Case ID must be specified", t.getMessage());
-        }
-
-        @Test
-        public void test03_notExistingCaseId() {
+        public void test02_notExistingCaseId() {
             Throwable t = assertThrows(ResourceNotFoundException.class,
                     () -> paymentCaseController.getPaymentCase(emptyCaseId));
             assertEquals("No payment case found with caseId=" + emptyCaseId, t.getMessage());
@@ -268,35 +298,21 @@ public class PaymentCaseControllerTests {
         }
 
         @Test
-        public void test02_invalidCaseId() {
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.resolvePaymentCase(null, ResolutionEnum.ACCEPT));
-            assertEquals("Case ID must be specified", t.getMessage());
-        }
-
-        @Test
-        public void test03_emptyCaseId() {
+        public void test02_emptyCaseId() {
             Throwable t = assertThrows(ResourceNotFoundException.class,
                     () -> paymentCaseController.resolvePaymentCase(emptyCaseId, ResolutionEnum.ACCEPT));
             assertEquals("No payment case found with caseId=" + emptyCaseId, t.getMessage());
         }
 
         @Test
-        public void test04_caseAlreadyResolved() {
+        public void test03_caseAlreadyResolved() {
             Throwable t = assertThrows(ValidationException.class,
                     () -> paymentCaseController.resolvePaymentCase(resolvedCaseId, ResolutionEnum.ACCEPT));
             assertEquals("Payment case has already been resolved: ACCEPT", t.getMessage());
         }
 
         @Test
-        public void test05_emptyResolution() {
-            Throwable t = assertThrows(ValidationException.class,
-                    () -> paymentCaseController.resolvePaymentCase(UUID.randomUUID(), null));
-            assertEquals("Payment case must have a resolution to be resolved", t.getMessage());
-        }
-
-        @Test
-        public void test06_invalidResolution() {
+        public void test04_invalidResolution() {
             Throwable t = assertThrows(ValidationException.class,
                     () -> paymentCaseController.resolvePaymentCase(UUID.randomUUID(), ResolutionEnum.UNRESOLVED));
             assertEquals("Payment case resolution can only be ACCEPT or REJECT", t.getMessage());

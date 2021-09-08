@@ -30,7 +30,7 @@ public class PaymentCaseController {
             @ApiParam(value = "paymentCase", required = true) @RequestBody PaymentCasePostDto paymentCaseInput
             ) {
         PaymentCase paymentCase = mapPostDtoToModel(paymentCaseInput);
-        return paymentCase.getCaseId();
+        return paymentCase.save();
     }
 
     @GetMapping(value = "/{caseId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,32 +48,20 @@ public class PaymentCaseController {
             @ApiParam(value = "resolution", required = true) @RequestBody ResolutionEnum resolution
     ) {
         PaymentCase paymentCase = new PaymentCase(caseId, repository);
-        paymentCase.resolveCase(resolution, repository);
+        paymentCase.resolveCase(resolution);
     }
 
     private PaymentCase mapPostDtoToModel(PaymentCasePostDto postDto) {
-        if (postDto == null) {
-            return null;
-        } else if (postDto.getPayment() == null) {
-            return new PaymentCase(postDto.getCaseType(), null, repository);
-        } else if (postDto.getPayment().getPaymentAmount() == null) {
-            return new PaymentCase(
-                    postDto.getCaseType(),
-                    new Payment(postDto.getPayment().getPaymentId(), null),
-                    repository
-            );
-        } else {
-            return new PaymentCase(
-                    postDto.getCaseType(),
-                    new Payment(
-                            postDto.getPayment().getPaymentId(),
-                            new AmountCurrency(
-                                    postDto.getPayment().getPaymentAmount().getAmount(),
-                                    postDto.getPayment().getPaymentAmount().getCurrency()
-                            )
-                    ),
-                    repository
-            );
-        }
+        return new PaymentCase(
+                postDto.getCaseType(),
+                new Payment(
+                        postDto.getPayment().getPaymentId(),
+                        new AmountCurrency(
+                                postDto.getPayment().getPaymentAmount().getAmount(),
+                                postDto.getPayment().getPaymentAmount().getCurrency()
+                        )
+                ),
+                repository
+        );
     }
 }
