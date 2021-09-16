@@ -1,6 +1,7 @@
 package com.example.api.controller;
 
 import com.example.api.controller.dto.PaymentCasePostDto;
+import com.example.domain.error.ResourceNotFoundException;
 import com.example.domain.models.AmountCurrency;
 import com.example.domain.models.Payment;
 import com.example.domain.models.PaymentCase;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -38,7 +40,7 @@ public class PaymentCaseController {
     public PaymentCase getPaymentCase(
             @ApiParam(value = "caseId", required = true) @PathVariable(value = "caseId") UUID caseId
     ) {
-        return new PaymentCase(caseId, repository);
+        return findPaymentCase(caseId);
     }
 
     @PutMapping(value = "/{caseId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,7 +49,7 @@ public class PaymentCaseController {
             @ApiParam(value = "caseId", required = true) @PathVariable(value = "caseId") UUID caseId,
             @ApiParam(value = "resolution", required = true) @RequestBody ResolutionEnum resolution
     ) {
-        PaymentCase paymentCase = new PaymentCase(caseId, repository);
+        PaymentCase paymentCase = findPaymentCase(caseId);
         paymentCase.resolveCase(resolution);
     }
 
@@ -63,5 +65,14 @@ public class PaymentCaseController {
                 ),
                 repository
         );
+    }
+
+    private PaymentCase findPaymentCase(UUID caseId) {
+        Optional<PaymentCase> paymentCase = repository.findById(caseId);
+        if (paymentCase.isEmpty()) {
+            throw new ResourceNotFoundException("No payment case found with caseId=" + caseId);
+        } else {
+            return paymentCase.get();
+        }
     }
 }

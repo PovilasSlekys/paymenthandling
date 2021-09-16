@@ -1,16 +1,13 @@
 package com.example.domain.models;
 
-import com.example.domain.error.ResourceNotFoundException;
-import com.example.domain.error.ValidationException;
 import com.example.domain.repositories.PaymentCaseRepository;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
-public class PaymentCaseAggregate {
+public class UnresolvedCaseStatistics {
 
     @Getter
     private BigDecimal unresolvedCases;
@@ -18,7 +15,15 @@ public class PaymentCaseAggregate {
     @Getter
     private List<AmountCurrency> unresolvedCaseAmounts;
 
-    public PaymentCaseAggregate(PaymentCaseRepository repository) {
+    private final PaymentCaseRepository repository;
+
+    public UnresolvedCaseStatistics(PaymentCaseRepository repository) {
+        this.repository = repository;
+        this.unresolvedCases = BigDecimal.ZERO;
+        this.unresolvedCaseAmounts = new ArrayList<>();
+    }
+
+    public void findUnresolvedCaseStatistics() {
         this.unresolvedCases = repository.getUnresolvedCases();
         this.unresolvedCaseAmounts = repository.getUnresolvedCaseAmounts();
     }

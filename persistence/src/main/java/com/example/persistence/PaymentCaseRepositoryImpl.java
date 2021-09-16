@@ -1,9 +1,9 @@
 package com.example.persistence;
 
 import com.example.domain.models.*;
+import com.example.domain.repositories.PaymentCaseRepository;
 import com.example.persistence.entities.PaymentCaseEntity;
 import com.example.persistence.repositories.PaymentCaseJpaRepository;
-import com.example.domain.repositories.PaymentCaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Repository;
@@ -71,12 +71,10 @@ public class PaymentCaseRepositoryImpl implements PaymentCaseRepository {
         Payment payment = new Payment(entity.getPaymentId(), new AmountCurrency(entity.getAmount(), entity.getCurrency()));
         return new PaymentCase(
                 entity.getCaseId(),
-                mapToEnum(CaseTypeEnum.class, entity.getCaseType()),
+                CaseTypeEnum.valueOf(entity.getCaseType().toString()),
                 payment,
-                mapToEnum(ResolutionEnum.class, entity.getResolution()));
+                ResolutionEnum.valueOf(entity.getResolution()),
+                this);
     }
 
-    private <T extends Enum<T>> T mapToEnum(Class<T> enumClass, String enumValue) {
-        return enumValue == null ? null : Enum.valueOf(enumClass, enumValue);
-    }
 }

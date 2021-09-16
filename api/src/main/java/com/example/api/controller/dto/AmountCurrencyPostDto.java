@@ -1,6 +1,5 @@
 package com.example.api.controller.dto;
 
-import com.example.domain.models.AmountCurrency;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,15 +1,15 @@
 package com.example.persistence.entities;
 
-import com.example.domain.models.CaseTypeEnum;
-import com.example.domain.models.Payment;
 import com.example.domain.models.PaymentCase;
-import com.example.domain.models.ResolutionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -42,14 +42,11 @@ public class PaymentCaseEntity {
 
     public PaymentCaseEntity(PaymentCase paymentCase) {
         this.caseId = paymentCase.getCaseId();
-        this.caseType = mapToString(paymentCase.getCaseType());
-        this.resolution = mapToString(paymentCase.getResolution());
+        this.caseType = paymentCase.getCaseType().toString();
+        this.resolution = paymentCase.getResolution().toString();
         this.paymentId = paymentCase.getPayment().getPaymentId();
         this.amount = paymentCase.getPayment().getPaymentAmount().getAmount();
         this.currency = paymentCase.getPayment().getPaymentAmount().getCurrency();
     }
 
-    private String mapToString(Object enumValue) {
-        return enumValue == null ? null : enumValue.toString();
-    }
 }

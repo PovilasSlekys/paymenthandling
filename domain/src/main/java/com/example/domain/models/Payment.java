@@ -1,10 +1,6 @@
 package com.example.domain.models;
 
-import com.example.domain.error.ValidationException;
-import lombok.Data;
 import lombok.Getter;
-
-import java.math.BigDecimal;
 
 public class Payment {
 
@@ -16,7 +12,7 @@ public class Payment {
 
     public Payment(String paymentId, AmountCurrency paymentAmount) {
         this.paymentId = paymentId;
-        this.paymentAmount = new AmountCurrency(paymentAmount.getAmount(), paymentAmount.getCurrency());
+        this.paymentAmount = paymentAmount;
     }
 
 }

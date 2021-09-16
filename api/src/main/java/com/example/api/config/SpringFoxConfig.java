@@ -1,8 +1,7 @@
 package com.example.api.config;
 
-import com.example.api.controller.PaymentCaseAggregateController;
 import com.example.api.controller.PaymentCaseController;
-import com.example.domain.error.ErrorInformation;
+import com.example.api.controller.UnresolvedCaseStatisticsController;
 import com.example.domain.error.ErrorResponse;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicates;
@@ -54,7 +53,7 @@ public class SpringFoxConfig {
                 .produces(Sets.newHashSet(MediaType.APPLICATION_JSON_VALUE))
                 .consumes(Sets.newHashSet(MediaType.APPLICATION_JSON_VALUE))
                 .tags(new Tag(PaymentCaseController.CONTROLLER_TAG, "Responsible for the resolution of unresolved payment cases"),
-                        new Tag(PaymentCaseAggregateController.CONTROLLER_TAG, "Responsible for returning aggregate data of unresolved payments"))
+                        new Tag(UnresolvedCaseStatisticsController.CONTROLLER_TAG, "Responsible for returning statistics of unresolved payment cases"))
                 .apiInfo(new ApiInfo(title, "API related to the handling of automatically unresolved payment cases",
                         "1.0", null, null, null, null, new ArrayList<>()));
     }

@@ -1,12 +1,9 @@
 package com.example.domain.models;
 
-import com.example.domain.error.ResourceNotFoundException;
 import com.example.domain.error.ValidationException;
 import com.example.domain.repositories.PaymentCaseRepository;
-import lombok.Data;
 import lombok.Getter;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public class PaymentCase {
@@ -23,7 +20,7 @@ public class PaymentCase {
     @Getter
     private ResolutionEnum resolution;
 
-    private PaymentCaseRepository repository;
+    private final PaymentCaseRepository repository;
 
     public PaymentCase(CaseTypeEnum caseType, Payment payment, PaymentCaseRepository repository) {
         this.caseId = UUID.randomUUID();
@@ -33,25 +30,13 @@ public class PaymentCase {
         this.repository = repository;
     }
 
-    public PaymentCase(UUID caseId, CaseTypeEnum caseType, Payment payment, ResolutionEnum resolution) {
+    public PaymentCase(UUID caseId, CaseTypeEnum caseType, Payment payment, ResolutionEnum resolution,
+                       PaymentCaseRepository repository) {
         this.caseId = caseId;
         this.caseType = caseType;
-        this.payment = new Payment(payment.getPaymentId(), payment.getPaymentAmount());
+        this.payment = payment;
         this.resolution = resolution;
-    }
-
-    public PaymentCase(UUID caseId, PaymentCaseRepository repository) {
         this.repository = repository;
-        Optional<PaymentCase> paymentCase = this.repository.findById(caseId);
-        if (paymentCase.isEmpty()) {
-            throw new ResourceNotFoundException("No payment case found with caseId=" + caseId);
-        } else {
-            this.caseId = paymentCase.get().getCaseId();
-            this.caseType = paymentCase.get().getCaseType();
-            Payment payment = paymentCase.get().getPayment();
-            this.payment = new Payment(payment.getPaymentId(), payment.getPaymentAmount());
-            this.resolution = paymentCase.get().getResolution();
-        }
     }
 
     public UUID save() {

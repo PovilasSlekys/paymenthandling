@@ -1,7 +1,5 @@
 package com.example.domain.error;
 
-import com.example.domain.error.ErrorInformation;
-import com.example.domain.error.ErrorTypeEnum;
 import lombok.Data;
 
 @Data
