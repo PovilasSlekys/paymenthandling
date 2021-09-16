@@ -1,1 +1,6 @@
 # Project exclude paths
+/api/target/
+/application/target/
+/domain/target/
+/persistence/target/
+/.idea
